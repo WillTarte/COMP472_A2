@@ -2,6 +2,7 @@ import unittest
 from xpuzzle import XPuzzle
 from typing import List, Tuple, Dict
 import numpy as np
+import traceback
 
 
 class TestXPuzzle(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestXPuzzle(unittest.TestCase):
             np.array_equal(np.array([[3, 0, 1, 4], [2, 6, 5, 7]]), to_test.state),
             "Should be equivalent",
         )
-        self.assertEqual((2, 4), to_test.size, "Should be equivalent")
+        self.assertEqual((2, 4), to_test.shape, "Should be equivalent")
 
     def test_from_array_wrong_size_should_fail(self):
         data_array1: List[int] = [3, 0, 1, 4, 2, 6, 5, 7]
@@ -67,7 +68,7 @@ class TestXPuzzle(unittest.TestCase):
             ),
             "Should be True",
         )
-        self.assertEqual((3, 6), puzzle_to_test1.size, "Should be equivalent")
+        self.assertEqual((3, 6), puzzle_to_test1.shape, "Should be equivalent")
 
         self.assertTrue(
             np.array_equal(
@@ -85,7 +86,7 @@ class TestXPuzzle(unittest.TestCase):
             ),
             "Should be True",
         )
-        self.assertEqual((6, 3), puzzle_to_test2.size, "Should be equivalent")
+        self.assertEqual((6, 3), puzzle_to_test2.shape, "Should be equivalent")
 
     def test_from_file_should_pass(self):
         puzzles_to_test: List[XPuzzle] = XPuzzle.from_file(r"./samplePuzzles.txt")
@@ -98,7 +99,7 @@ class TestXPuzzle(unittest.TestCase):
             ),
             "Should be True",
         )
-        self.assertEqual((2, 4), puzzles_to_test[0].size, "should be equivalent")
+        self.assertEqual((2, 4), puzzles_to_test[0].shape, "should be equivalent")
 
         self.assertTrue(
             np.array_equal(
@@ -106,7 +107,7 @@ class TestXPuzzle(unittest.TestCase):
             ),
             "Should be True",
         )
-        self.assertEqual((2, 4), puzzles_to_test[1].size, "should be equivalent")
+        self.assertEqual((2, 4), puzzles_to_test[1].shape, "should be equivalent")
 
         self.assertTrue(
             np.array_equal(
@@ -114,7 +115,7 @@ class TestXPuzzle(unittest.TestCase):
             ),
             "Should be equivalent",
         )
-        self.assertEqual((2, 4), puzzles_to_test[2].size, "should be equivalent")
+        self.assertEqual((2, 4), puzzles_to_test[2].shape, "should be equivalent")
 
     def test_eq_should_pass(self):
         puzzle1 = XPuzzle.from_array([3, 0, 1, 4, 2, 6, 5, 7])
@@ -127,10 +128,20 @@ class TestXPuzzle(unittest.TestCase):
         self.assertTrue(puzzle1.is_goal_state())
         self.assertTrue(puzzle2.is_goal_state())
 
+    def test_find_valid_moves_should_pass(self):
+        try:
+            puzzle = XPuzzle.from_array([3, 0, 1, 4, 2, 6, 5, 7])
+            puzzle.find_valid_moves()
+        except Exception as exc:
+            self.fail(traceback.format_exc())
 
 if __name__ == "__main__":
     unittest.main()
 
-    # data_array: List[int] = [3, 0, 1, 4, 2, 6, 5, 7]
-    # to_test: XPuzzle = XPuzzle.from_array(data_array)
-    # print(to_test)
+    #data_array: List[int] = [3, 0, 1, 4, 2, 6, 5, 7]
+    #to_test: XPuzzle = XPuzzle.from_array(data_array)
+    #print(to_test)
+
+    #to_test.find_valid_moves()
+    #for x in to_test.valid_moves:
+    #    print(x)
