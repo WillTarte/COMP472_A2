@@ -2,10 +2,18 @@ import numpy as np;
 def main():
     """ Heuristics """
     testBoard1 = np.array([(5, 0, 8), (4, 2, 1), (7, 3, 6)])
+    print("H0: " + str(calcH0(testBoard1)))
     print("H1: (Goal 1, Goal 2) " + str(calcH1(testBoard1)))
     print("H2 (Goal 1, Goal 2): " + str(calcH2(testBoard1)))
     return 0
 
+def calcH0(board):
+    flattenedBoard = board.flatten();
+    lastElement = (len(flattenedBoard) - 1);
+    if (flattenedBoard[lastElement] != 0):
+        return 1;
+    else:
+        return 0;
 
 def calcH1(board):
     """Uses Sum of Permuations Inversions"""
