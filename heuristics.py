@@ -1,10 +1,10 @@
 import numpy as np;
 def main():
     """ Heuristics """
-    testBoard1 = np.array([(5, 0, 8), (4, 2, 1), (7, 3, 6)])
+    testBoard1 = np.array([(4, 2, 3, 1), (5, 6, 7, 0)])
     print("H0: " + str(calcH0(testBoard1)))
     print("H1: (Goal 1, Goal 2) " + str(calcH1(testBoard1)))
-    print("H2 (Goal 1, Goal 2): " + str(calcH2(testBoard1)))
+    print("H2: (Goal 1, Goal 2) " + str(calcH2(testBoard1)))
     return 0
 
 def calcH0(board):
