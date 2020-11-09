@@ -1,6 +1,7 @@
 import numpy as np
 from typing import List, Dict, Tuple, Type
 from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 
 
 class XPuzzle:
@@ -131,13 +132,13 @@ class XPuzzle:
 
         # normal diagonal moves
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] + 1 != self.shape[1]:
-            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, self.shape[1] + 1))
+            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] + 1))
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] + 1 != self.shape[1]:
             diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] + 1))
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] - 1 != -1:
-            diagMove = DiagonalMove((blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1)))
+            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1))
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] -1 != -1:
             diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] - 1))
@@ -190,6 +191,24 @@ class XPuzzle:
         return XPuzzle(np.copy(self.state), self.shape)
 
 
+@dataclass(order=True)
+class PrioritizedPuzzle:
+    """
+    https://bugs.python.org/issue31145
+    Wrapper class to be able to keep XPuzzles in a Priority Queue
+    """
+    priority: int
+    item: XPuzzle=field(compare=False)
+
+    def __init__(self, priority: int, item: XPuzzle):
+        self.priority = priority
+        self.item = item
+    
+    def __iter__(self):
+        yield self.priority
+        yield self.item
+
+
 class Move(ABC):
     @abstractmethod
     def __init__(self, idx1: Tuple[int, int], idx2: Tuple[int, int]):
@@ -201,7 +220,6 @@ class Move(ABC):
         Executes the move on the given XPuzzle, essentially just swapping the tiles specified by the two set of indices.
         To get back the original XPuzzle, just execute the same move on it again.
         """
-
         puzzle_copy = puzzle.copy()
         (
             puzzle_copy.state[self.idx1[0]][self.idx1[1]],
