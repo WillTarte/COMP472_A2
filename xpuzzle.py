@@ -154,10 +154,11 @@ class XPuzzle:
         goal_1 = True
         goal_2 = True
 
+        if self.state[self.shape[0] - 1][self.shape[1] - 1] != 0:
+            return False
+
         for row in self.state:
-            if list(filter(lambda x: x != 0, row)) != sorted(
-                list(filter(lambda x: x != 0, row))
-            ):
+            if list(filter(lambda x: x != 0, row)) != sorted(list(filter(lambda x: x != 0, row))):
                 goal_1 = False
                 break
 
@@ -187,6 +188,9 @@ class XPuzzle:
     def __eq__(self, other) -> bool:
         return np.array_equal(self.state, other.state)
 
+    def __hash__(self) -> int:
+        return hash(str(self.state))
+
     def copy(self) -> 'XPuzzle':
         return XPuzzle(np.copy(self.state), self.shape)
 
@@ -214,6 +218,8 @@ class Move(ABC):
     def __init__(self, idx1: Tuple[int, int], idx2: Tuple[int, int]):
         self.idx1 = idx1
         self.idx2 = idx2
+        self.name = ""
+        self.cost = 0
 
     def execute(self, puzzle: XPuzzle) -> XPuzzle:
         """

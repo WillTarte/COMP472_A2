@@ -128,6 +128,14 @@ class TestXPuzzle(unittest.TestCase):
         self.assertTrue(puzzle1.is_goal_state())
         self.assertTrue(puzzle2.is_goal_state())
 
+    def test_is_goal_state_false_should_pass(self):
+        puzzle1 = XPuzzle.from_array([1, 2, 3, 5, 0, 4, 6, 7])
+        puzzle2 = XPuzzle.from_array([1, 2, 3, 4, 5, 6, 0, 7])
+        puzzle3 = XPuzzle.from_array([1, 3, 5, 7, 2, 4, 0, 6])
+        self.assertFalse(puzzle1.is_goal_state())
+        self.assertFalse(puzzle2.is_goal_state())
+        self.assertFalse(puzzle3.is_goal_state())
+
     def test_find_valid_moves_should_pass(self):
         try:
             puzzle = XPuzzle.from_array([3, 0, 1, 4, 2, 6, 5, 7])
@@ -145,3 +153,6 @@ if __name__ == "__main__":
     #to_test.find_valid_moves()
     #for x in to_test.valid_moves:
     #    print(x)
+
+    #puzzle = XPuzzle.from_array([1, 2, 3, 5, 0, 4, 6, 7])
+    #print(puzzle.is_goal_state())
