@@ -132,9 +132,14 @@ class TestXPuzzle(unittest.TestCase):
         puzzle1 = XPuzzle.from_array([1, 2, 3, 5, 0, 4, 6, 7])
         puzzle2 = XPuzzle.from_array([1, 2, 3, 4, 5, 6, 0, 7])
         puzzle3 = XPuzzle.from_array([1, 3, 5, 7, 2, 4, 0, 6])
+        puzzle4 = XPuzzle.from_array([2, 4, 6, 7, 1, 3, 5, 0])
+        puzzle5 = XPuzzle.from_array([5, 6, 7, 0, 1, 2, 3, 4])
+
         self.assertFalse(puzzle1.is_goal_state())
         self.assertFalse(puzzle2.is_goal_state())
         self.assertFalse(puzzle3.is_goal_state())
+        self.assertFalse(puzzle4.is_goal_state())
+        self.assertFalse(puzzle5.is_goal_state())
 
     def test_find_valid_moves_should_pass(self):
         try:

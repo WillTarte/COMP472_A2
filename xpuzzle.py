@@ -3,7 +3,6 @@ from typing import List, Dict, Tuple, Type
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
-
 class XPuzzle:
     """
     Represents some state s of the XPuzzle
@@ -151,28 +150,22 @@ class XPuzzle:
         """
         Returns True if this puzzle state is within 1 of 2 goal configurations.
         """
-        goal_1 = True
-        goal_2 = True
 
-        if self.state[self.shape[0] - 1][self.shape[1] - 1] != 0:
-            return False
+        goal_1_array: List[List[int]] = []
+        for row_idx in range(0, self.shape[0]):
+            goal_1_array.append(list(range(1 + row_idx * self.shape[1], 1 + self.shape[1] * (1 + row_idx))))
+        goal_1_array[-1][-1] = 0
 
-        for row in self.state:
-            if list(filter(lambda x: x != 0, row)) != sorted(list(filter(lambda x: x != 0, row))):
-                goal_1 = False
-                break
 
-        if not goal_1:
-            for col_idx in range(0, self.shape[1]):
-                for row_idx in range(0, self.shape[0] - 1):
-                    if (
-                        self.state[row_idx + 1][col_idx]
-                        != self.state[row_idx][col_idx] + 1
-                    ):
-                        goal_2 = False
-                        break
+        goal_2_array: List[List[int]] = []
+        for row_idx in range (1, self.shape[0] + 1):
+            goal_2_array.append([row_idx + i * self.shape[0] for i in range(0, self.shape[1])])
+        goal_2_array[-1][-1] = 0
 
-        return goal_1 or goal_2
+        if np.array_equal(self.state, goal_1_array) or np.array_equal(self.state, goal_2_array):
+            return True
+            
+        return False
 
     def __repr__(self) -> str:
         acc_str: str = ""
