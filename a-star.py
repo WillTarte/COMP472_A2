@@ -25,10 +25,14 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
     fScore: Dict[XPuzzle, int] = {}
     fScore[starting_puzzle] = min(h(starting_puzzle.state))
 
-    while not openSet.empty():
+    path_taken: List[XPuzzle] = []
 
+    while not openSet.empty():
+        
         priority, current = openSet.get()
+        
         if current.is_goal_state():
+            path_taken = reconstruct_path(cameFrom, current)
             break
 
         if len(current.valid_moves) == 0:
@@ -44,13 +48,28 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
                 if PrioritizedPuzzle(fScore[neighbour], neighbour) not in openSet.queue:
                     openSet.put(PrioritizedPuzzle(fScore[neighbour], neighbour))
 
-    return cameFrom, fScore
+    return path_taken
+
+def reconstruct_path(edges_taken: Dict[XPuzzle, Optional[XPuzzle]], current_state: XPuzzle) -> List[XPuzzle]:
+    """
+    Builds the reverse path. I.e. the path from the current_state, to the start state.
+    """
+
+    path_taken: List[XPuzzle] = []
+    current: Optional[XPuzzle] = current_state
+    
+    while current is not None:
+        print(current)
+        path_taken.append(current)
+        current = edges_taken[current]
+        
+
+    return path_taken
 
 if __name__ == "__main__":
 
-    puzzles: List[XPuzzle] = XPuzzle.from_file(r"samplePuzzles.txt")
+    #puzzles: List[XPuzzle] = XPuzzle.from_file(r"samplePuzzles.txt")
+    data_array: List[int] = [1, 2, 3, 4, 5, 0, 6, 7]
+    to_test: XPuzzle = XPuzzle.from_array(data_array)
 
-    for puzzle in puzzles:
-        a_star(puzzle, calcH0)
-        a_star(puzzle, calcH1)
-        a_star(puzzle, calcH2)
+    path_taken = a_star(to_test, calcH2)

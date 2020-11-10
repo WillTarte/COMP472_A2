@@ -154,10 +154,11 @@ class XPuzzle:
         goal_1 = True
         goal_2 = True
 
+        if self.state[self.shape[0] - 1][self.shape[1] - 1] != 0:
+            return False
+
         for row in self.state:
-            if list(filter(lambda x: x != 0, row)) != sorted(
-                list(filter(lambda x: x != 0, row))
-            ):
+            if list(filter(lambda x: x != 0, row)) != sorted(list(filter(lambda x: x != 0, row))):
                 goal_1 = False
                 break
 
