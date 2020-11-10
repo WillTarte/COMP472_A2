@@ -24,7 +24,7 @@ class XPuzzle:
     @classmethod
     def from_file(
         cls, filename: str, shape: Tuple[int, int] = (2, 4)
-    ) -> List['XPuzzle']:
+    ) -> List["XPuzzle"]:
         """
         Returns an array of XPuzzles based on a file's content where each line is one puzzle configuration.
         Each puzzle is assumed to have the same size
@@ -86,39 +86,53 @@ class XPuzzle:
 
         # horizontal moves
         if blank_tile_idx[1] != 0:
-            hmRight = HorizontalMove((blank_tile_idx[0], blank_tile_idx[1] - 1), blank_tile_idx)
+            hmRight = HorizontalMove(
+                (blank_tile_idx[0], blank_tile_idx[1] - 1), blank_tile_idx
+            )
             moves.append((hmRight, hmRight.execute(self)))
         if blank_tile_idx[1] != self.shape[1] - 1:
-            hmLeft = HorizontalMove(blank_tile_idx, (blank_tile_idx[0], blank_tile_idx[1] + 1))
+            hmLeft = HorizontalMove(
+                blank_tile_idx, (blank_tile_idx[0], blank_tile_idx[1] + 1)
+            )
             moves.append((hmLeft, hmLeft.execute(self)))
 
         # vertical moves
         if blank_tile_idx[0] != 0:
-            vmDown = VerticalMove((blank_tile_idx[0] - 1, blank_tile_idx[1]), blank_tile_idx)
+            vmDown = VerticalMove(
+                (blank_tile_idx[0] - 1, blank_tile_idx[1]), blank_tile_idx
+            )
             moves.append((vmDown, vmDown.execute(self)))
         if blank_tile_idx[0] != self.shape[0] - 1:
-            vmUp = VerticalMove(blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1]))
+            vmUp = VerticalMove(
+                blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1])
+            )
             moves.append((vmUp, vmUp.execute(self)))
-        
+
         # wrapping moves
         if blank_tile_idx[1] == self.shape[1] - 1:
             wmLeft = WrappingMove(blank_tile_idx, (blank_tile_idx[0], 0))
             moves.append((wmLeft, wmLeft.execute(self)))
         elif blank_tile_idx[1] == 0:
-            wmRight = WrappingMove((blank_tile_idx[0], self.shape[1] - 1), blank_tile_idx)
+            wmRight = WrappingMove(
+                (blank_tile_idx[0], self.shape[1] - 1), blank_tile_idx
+            )
             moves.append((wmRight, wmRight.execute(self)))
 
         if blank_tile_idx[0] == self.shape[0] - 1:
             wmUp = WrappingMove(blank_tile_idx, (0, blank_tile_idx[1]))
             moves.append((wmUp, wmUp.execute(self)))
         elif blank_tile_idx[0] == 0:
-            wmDown = WrappingMove(blank_tile_idx, (self.shape[0] - 1, blank_tile_idx[1]))
+            wmDown = WrappingMove(
+                blank_tile_idx, (self.shape[0] - 1, blank_tile_idx[1])
+            )
             moves.append((wmDown, wmDown.execute(self)))
 
         # diagonal moves
         # corner moves
         if blank_tile_idx[0] == 0 and blank_tile_idx[1] == 0:
-            diagMove = DiagonalMove(blank_tile_idx, (self.shape[0] - 1, self.shape[1] - 1))
+            diagMove = DiagonalMove(
+                blank_tile_idx, (self.shape[0] - 1, self.shape[1] - 1)
+            )
             moves.append((diagMove, diagMove.execute(self)))
         elif blank_tile_idx[0] == 0 and blank_tile_idx[1] == self.shape[1] - 1:
             diagMove = DiagonalMove(blank_tile_idx, (self.shape[0] - 1, 0))
@@ -126,22 +140,36 @@ class XPuzzle:
         elif blank_tile_idx[0] == self.shape[0] - 1 and blank_tile_idx[1] == 0:
             diagMove = DiagonalMove(blank_tile_idx, (0, self.shape[1] - 1))
             moves.append((diagMove, diagMove.execute(self)))
-        elif blank_tile_idx[0] == self.shape[0] - 1 and blank_tile_idx[1] == self.shape[1] - 1:
+        elif (
+            blank_tile_idx[0] == self.shape[0] - 1
+            and blank_tile_idx[1] == self.shape[1] - 1
+        ):
             diagMove = DiagonalMove(blank_tile_idx, (0, 0))
             moves.append((diagMove, diagMove.execute(self)))
 
         # normal diagonal moves
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] + 1 != self.shape[1]:
-            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] + 1))
+            diagMove = DiagonalMove(
+                blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] + 1)
+            )
             moves.append((diagMove, diagMove.execute(self)))
-        if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] + 1 != self.shape[1]:
-            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] + 1))
+        if (
+            blank_tile_idx[0] + 1 != self.shape[0]
+            and blank_tile_idx[1] + 1 != self.shape[1]
+        ):
+            diagMove = DiagonalMove(
+                blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] + 1)
+            )
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] - 1 != -1:
-            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1))
+            diagMove = DiagonalMove(
+                blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1)
+            )
             moves.append((diagMove, diagMove.execute(self)))
-        if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] -1 != -1:
-            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] - 1))
+        if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] - 1 != -1:
+            diagMove = DiagonalMove(
+                blank_tile_idx, (blank_tile_idx[0] + 1, blank_tile_idx[1] - 1)
+            )
             moves.append((diagMove, diagMove.execute(self)))
 
         assert len(moves) != 0, "Could not generate any moves"
@@ -151,28 +179,31 @@ class XPuzzle:
         """
         Returns True if this puzzle state is within 1 of 2 goal configurations.
         """
-        goal_1 = True
-        goal_2 = True
 
-        if self.state[self.shape[0] - 1][self.shape[1] - 1] != 0:
-            return False
+        goal_1_array: List[List[int]] = []
+        for row_idx in range(0, self.shape[0]):
+            goal_1_array.append(
+                list(
+                    range(
+                        1 + row_idx * self.shape[1], 1 + self.shape[1] * (1 + row_idx)
+                    )
+                )
+            )
+        goal_1_array[-1][-1] = 0
 
-        for row in self.state:
-            if list(filter(lambda x: x != 0, row)) != sorted(list(filter(lambda x: x != 0, row))):
-                goal_1 = False
-                break
+        goal_2_array: List[List[int]] = []
+        for row_idx in range(1, self.shape[0] + 1):
+            goal_2_array.append(
+                [row_idx + i * self.shape[0] for i in range(0, self.shape[1])]
+            )
+        goal_2_array[-1][-1] = 0
 
-        if not goal_1:
-            for col_idx in range(0, self.shape[1]):
-                for row_idx in range(0, self.shape[0] - 1):
-                    if (
-                        self.state[row_idx + 1][col_idx]
-                        != self.state[row_idx][col_idx] + 1
-                    ):
-                        goal_2 = False
-                        break
+        if np.array_equal(self.state, goal_1_array) or np.array_equal(
+            self.state, goal_2_array
+        ):
+            return True
 
-        return goal_1 or goal_2
+        return False
 
     def __repr__(self) -> str:
         acc_str: str = ""
@@ -191,7 +222,7 @@ class XPuzzle:
     def __hash__(self) -> int:
         return hash(str(self.state))
 
-    def copy(self) -> 'XPuzzle':
+    def copy(self) -> "XPuzzle":
         return XPuzzle(np.copy(self.state), self.shape)
 
 
@@ -201,13 +232,14 @@ class PrioritizedPuzzle:
     https://bugs.python.org/issue31145
     Wrapper class to be able to keep XPuzzles in a Priority Queue
     """
+
     priority: int
-    item: XPuzzle=field(compare=False)
+    item: XPuzzle = field(compare=False)
 
     def __init__(self, priority: int, item: XPuzzle):
         self.priority = priority
         self.item = item
-    
+
     def __iter__(self):
         yield self.priority
         yield self.item
@@ -235,6 +267,7 @@ class Move(ABC):
             puzzle_copy.state[self.idx1[0]][self.idx1[1]],
         )
         return puzzle_copy
+
 
 class VerticalMove(Move):
     def __init__(self, idx1: Tuple[int, int], idx2: Tuple[int, int]):
