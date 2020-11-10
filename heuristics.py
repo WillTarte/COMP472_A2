@@ -45,7 +45,7 @@ def calcH1(board):
 
 def calcH2(board):
     """Misplaced Tiles"""
-    #Returns tuples 
+    """#Returns tuples 
     flattenedBoard = board.flatten()
     boardLength = len(flattenedBoard)
     goalBoard1 = np.arange(1, boardLength + 1).reshape(board.shape[0], board.shape[1])
@@ -68,7 +68,34 @@ def calcH2(board):
     for i in range(0, len(flattenedBoard)):
         if (flattenedBoard[i] != 0):
             if (flattenedGoalBoard2[i] != flattenedBoard[i]):
-                outOfPlaceGoal2+= 1
+                outOfPlaceGoal2+= 1"""
+
+    board_shape = np.shape(board)
+
+    goal_1_array: List[List[int]] = []
+    for row_idx in range(0, board_shape[0]):
+        goal_1_array.append(list(range(1 + row_idx * board_shape[1], 1 + board_shape[1] * (1 + row_idx))))
+    goal_1_array[-1][-1] = 0
+
+
+    goal_2_array: List[List[int]] = []
+    for row_idx in range (1, board_shape[0] + 1):
+        goal_2_array.append([row_idx + i * board_shape[0] for i in range(0, board_shape[1])])
+    goal_2_array[-1][-1] = 0
+
+    goal_1_array = np.array(goal_1_array).flatten()
+    goal_2_array = np.array(goal_2_array).flatten()
+
+    outOfPlaceGoal1 = 0
+    outOfPlaceGoal2 = 0
+
+    for num_1, num_2 in zip(goal_1_array, np.ravel(board)):
+        if num_1 != num_2:
+            outOfPlaceGoal1 += 1
+    
+    for num_1, num_2 in zip(goal_2_array, np.ravel(board)):
+        if num_1 != num_2:
+            outOfPlaceGoal2 += 1
 
     return (outOfPlaceGoal1, outOfPlaceGoal2)
 

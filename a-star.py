@@ -53,13 +53,14 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
 def reconstruct_path(edges_taken: Dict[XPuzzle, Optional[XPuzzle]], current_state: XPuzzle) -> List[XPuzzle]:
     """
     Builds the reverse path. I.e. the path from the current_state, to the start state.
+    Returns a list of XPuzzles. To get the right order of traversel, iterate on the list
+    in reverse (e.g. path_taken[::-1])
     """
 
     path_taken: List[XPuzzle] = []
     current: Optional[XPuzzle] = current_state
     
     while current is not None:
-        print(current)
         path_taken.append(current)
         current = edges_taken[current]
         
@@ -68,8 +69,8 @@ def reconstruct_path(edges_taken: Dict[XPuzzle, Optional[XPuzzle]], current_stat
 
 if __name__ == "__main__":
 
-    #puzzles: List[XPuzzle] = XPuzzle.from_file(r"samplePuzzles.txt")
-    data_array: List[int] = [1, 2, 3, 4, 5, 0, 6, 7]
-    to_test: XPuzzle = XPuzzle.from_array(data_array)
+    puzzles: List[XPuzzle] = XPuzzle.from_file(r"samplePuzzles.txt")
 
-    path_taken = a_star(to_test, calcH2)
+    for puzzle in puzzles:
+        path_taken = a_star(puzzle, calcH2)
+        print(len(path_taken))
