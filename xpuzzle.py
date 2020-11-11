@@ -188,7 +188,7 @@ class XPuzzle:
         return XPuzzle(np.copy(self.state), self.shape)
 
 
-@dataclass(order=True)
+@dataclass(order=True, unsafe_hash=True)
 class PrioritizedPuzzle:
     """
     https://bugs.python.org/issue31145
@@ -204,6 +204,9 @@ class PrioritizedPuzzle:
     def __iter__(self):
         yield self.priority
         yield self.item
+    
+    def __eq__(self, other):
+        return self.priority == other.priority and self.item == other.item
 
 
 class Move(ABC):
