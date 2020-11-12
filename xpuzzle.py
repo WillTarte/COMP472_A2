@@ -177,6 +177,12 @@ class XPuzzle:
             acc_str += "\n"
 
         return acc_str.strip("\n")
+    
+    def __str__(self) -> str:
+        str_acc = ""
+        for tile in np.ravel(self.state):
+            str_acc += str(tile) + " "
+        return str_acc.strip()
 
     def __eq__(self, other) -> bool:
         return np.array_equal(self.state, other.state)

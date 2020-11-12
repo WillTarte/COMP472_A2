@@ -1,20 +1,22 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
+from timeout import timeout
 from heuristics import calcH0, calcH1, calcH2
 import heapq
 import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
+import time
 
+@timeout(60)
 def a_star(starting_puzzle: XPuzzle, h: Callable):
     """
     A Star Informed search algorithm.
     https://en.wikipedia.org/wiki/A*_search_algorithm#Description
-    https://www.redblobgames.com/pathfinding/a-star/implementation.html
     """
 
     open_set: List[PrioritizedPuzzle] = []
     open_set.append(PrioritizedPuzzle(0, starting_puzzle))
 
-    closed_set: Set[PrioritizedPuzzle] = set()
+    closed_set: List[PrioritizedPuzzle] = []
 
     came_from: Dict[XPuzzle, Optional[Tuple[Type[Move], XPuzzle]]] = {}
     came_from[starting_puzzle] = None
@@ -36,10 +38,10 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
 
         priority, current = heapq.heappop(open_set)
         search_path.append((f_score[current], g_score[current], h_score[current], current))
-        closed_set.add(PrioritizedPuzzle(priority, current))
+        closed_set.append(PrioritizedPuzzle(priority, current))
         
         if current.is_goal_state():
-            path_taken = reconstruct_path(came_from, current)
+            path_taken = reconstruct_path(came_from, current) #type: ignore
             break
 
         if len(current.valid_moves) == 0:
@@ -78,7 +80,7 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
 
     return (path_taken, search_path, h_score, g_score, f_score)
 
-def reconstruct_path(edges_taken: Dict[XPuzzle, Optional[Tuple[Type[Move], XPuzzle]]], current_state: XPuzzle) -> List:
+def reconstruct_path(edges_taken: Dict[XPuzzle, Tuple[Type[Move], XPuzzle]], current_state: XPuzzle) -> List:
     """
     Builds the reverse path. I.e. the path from the current_state, to the start state.
     Returns a list of XPuzzles. To get the right order of traversel, iterate on the list
@@ -105,15 +107,83 @@ def reconstruct_path(edges_taken: Dict[XPuzzle, Optional[Tuple[Type[Move], XPuzz
 
 if __name__ == "__main__":
 
-    #puzzles: List[XPuzzle] = XPuzzle.from_file(r"samplePuzzles.txt")
+    def get_tile_to_move(move: Type[Move], puzzle: XPuzzle):
+        """
+        Helper function to get the (non-zero) tile moved during a move
+        """
+        num1 = puzzle.state[move.idx1[0]][move.idx1[1]]
+        num2 = puzzle.state[move.idx2[0]][move.idx2[1]]
+        return num1 if num1 != 0 else num2
 
-    #for puzzle in puzzles:
-    #    path_taken = a_star(puzzle, calcH0)
-    #    print(len(path_taken))
+    # Command line argument parsing
+    import argparse
 
-    puzzle = XPuzzle.from_array([1, 2, 4, 3, 5, 7, 6, 0])
+    parser = argparse.ArgumentParser(description="A Star algorithm using 2(+1) different heuristics.")
+    parser.add_argument('-f', '--filename', dest='filename', default=r"samplePuzzles.txt", type=str)
+    parser.add_argument('-s', '--shape', dest='shape', default=(2, 4), nargs=2)
 
-    path_taken, search_path, f_score, g_score, h_score = a_star(puzzle, calcH2)
-    print(len(path_taken))
+    args = parser.parse_args()
 
-    print(path_taken[::-1])
+    shape: Tuple[int, int] = tuple(args.shape) #type: ignore
+    puzzles = XPuzzle.from_file(args.filename, shape)
+
+    # Iterate through all the puzzles, applying a-star with heuristic #1 and #2 + output results to files
+    for ind, puzzle in enumerate(puzzles):
+
+        # h1
+        try:
+            # applying a-star
+            start_time = time.time()
+            path_taken_h1, search_path_h1, h_score_h1, g_score_h1, f_score_h1 = a_star(puzzle, calcH1)
+            elapsed_time = time.time() - start_time
+
+            # solution path file
+            with open("results/{}_astar-h1_solution.txt".format(ind), "w") as f_solution_h1:
+                total_cost = 0
+                for move, new_state in path_taken_h1[::-1]: # we iterate from end to beginning because the order is reversed
+                    if move is None:
+                        f_solution_h1.write("{} {} {}\n".format(0, 0, str(new_state)))
+                    else:
+                        f_solution_h1.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
+                        total_cost += move.cost
+                
+                f_solution_h1.write("\n{} {}".format(total_cost, elapsed_time))
+            
+            # search path file
+            with open("results/{}_astar-h1_search.txt".format(ind), "w") as f_search_h1:
+                for node in search_path_h1:
+                    f_search_h1.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
+        
+        except TimeoutError as e:
+            print(e)
+        except Exception as e:
+            print(e)
+        
+        # h2
+        try:
+            # applying a-star
+            start_time = time.time()
+            path_taken_h2, search_path_h2, h_score_h2, g_score_h2, f_score_h2 = a_star(puzzle, calcH2)
+            elapsed_time = time.time() - start_time
+
+            # solution path file
+            with open("results/{}_astar-h2_solution.txt".format(ind), "w") as f_solution_h2:
+                total_cost = 0
+                for move, new_state in path_taken_h2[::-1]: # we iterate from end to beginning because the order is reversed
+                    if move is None:
+                        f_solution_h2.write("{} {} {}\n".format(0, 0, str(new_state)))
+                    else:
+                        f_solution_h2.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
+                        total_cost += move.cost
+                
+                f_solution_h2.write("\n{} {}".format(total_cost, elapsed_time))
+            
+            # search path file
+            with open("results/{}_astar-h2_search.txt".format(ind), "w") as f_search_h2:
+                for node in search_path_h2:
+                    f_search_h2.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
+       
+        except TimeoutError as e:
+            print(e)
+        except Exception as e:
+            print(e)
