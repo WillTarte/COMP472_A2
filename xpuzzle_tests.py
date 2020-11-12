@@ -148,16 +148,6 @@ class TestXPuzzle(unittest.TestCase):
         except Exception as exc:
             self.fail(traceback.format_exc())
 
+
 if __name__ == "__main__":
     unittest.main()
-
-    #data_array: List[int] = [3, 0, 1, 4, 2, 6, 5, 7]
-    #to_test: XPuzzle = XPuzzle.from_array(data_array)
-    #print(to_test)
-
-    #to_test.find_valid_moves()
-    #for x in to_test.valid_moves:
-    #    print(x)
-
-    #puzzle = XPuzzle.from_array([1, 2, 3, 5, 0, 4, 6, 7])
-    #print(puzzle.is_goal_state())

@@ -1,4 +1,6 @@
-import numpy as np;
+import numpy as np
+
+
 def main():
     """ Heuristics """
     testBoard1 = np.array([(4, 2, 3, 1), (5, 6, 7, 0)])
@@ -6,6 +8,7 @@ def main():
     print("H1: (Goal 1, Goal 2) " + str(calcH1(testBoard1)))
     print("H2: (Goal 1, Goal 2) " + str(calcH2(testBoard1)))
     return 0
+
 
 def calcH0(board):
     flattenedBoard = board.flatten()
@@ -22,7 +25,7 @@ def calcH1(board):
     sumOfPermutations1 = 0
     sumOfPermutations2 = 0
 
-    #I know these double loops are garbage, Ill fix this Soon™ (Valve Time)
+    # I know these double loops are garbage, Ill fix this Soon™ (Valve Time)
     for i in range(len(flattenedBoard1)):
         if (flattenedBoard1[i] != 0):
             for j in range(i + 1, len(flattenedBoard1)):
@@ -32,7 +35,7 @@ def calcH1(board):
 
     for i in range(len(flattenedBoard2)):
         shouldBeOnLeft = 0
-        if (flattenedBoard2[i] != 0):
+        if flattenedBoard2[i] != 0:
             for j in range(i + 1, len(flattenedBoard2)):
                 if (flattenedBoard2[j] != 0):
                     if (flattenedBoard2[i] > flattenedBoard2[j]):
@@ -65,13 +68,12 @@ def calcH2(board):
     for num_1, num_2 in zip(goal_1_array, np.ravel(board)):
         if num_1 != num_2:
             outOfPlaceGoal1 += 1
-    
+
     for num_1, num_2 in zip(goal_2_array, np.ravel(board)):
         if num_1 != num_2:
             outOfPlaceGoal2 += 1
 
     return (outOfPlaceGoal1, outOfPlaceGoal2)
-
 
 
 if __name__ == "__main__":
