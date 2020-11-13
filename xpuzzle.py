@@ -3,7 +3,6 @@ from typing import List, Dict, Tuple, Type
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
-
 class XPuzzle:
     """
     Represents some state s of the XPuzzle
@@ -149,9 +148,7 @@ class XPuzzle:
 
         # normal diagonal moves
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] + 1 != self.shape[1]:
-            diagMove = DiagonalMove(
-                blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] + 1)
-            )
+            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] + 1))
             moves.append((diagMove, diagMove.execute(self)))
         if (
             blank_tile_idx[0] + 1 != self.shape[0]
@@ -162,9 +159,7 @@ class XPuzzle:
             )
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] - 1 != -1 and blank_tile_idx[1] - 1 != -1:
-            diagMove = DiagonalMove(
-                blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1)
-            )
+            diagMove = DiagonalMove(blank_tile_idx, (blank_tile_idx[0] - 1, blank_tile_idx[1] - 1))
             moves.append((diagMove, diagMove.execute(self)))
         if blank_tile_idx[0] + 1 != self.shape[0] and blank_tile_idx[1] - 1 != -1:
             diagMove = DiagonalMove(
@@ -182,27 +177,18 @@ class XPuzzle:
 
         goal_1_array: List[List[int]] = []
         for row_idx in range(0, self.shape[0]):
-            goal_1_array.append(
-                list(
-                    range(
-                        1 + row_idx * self.shape[1], 1 + self.shape[1] * (1 + row_idx)
-                    )
-                )
-            )
+            goal_1_array.append(list(range(1 + row_idx * self.shape[1], 1 + self.shape[1] * (1 + row_idx))))
         goal_1_array[-1][-1] = 0
 
+
         goal_2_array: List[List[int]] = []
-        for row_idx in range(1, self.shape[0] + 1):
-            goal_2_array.append(
-                [row_idx + i * self.shape[0] for i in range(0, self.shape[1])]
-            )
+        for row_idx in range (1, self.shape[0] + 1):
+            goal_2_array.append([row_idx + i * self.shape[0] for i in range(0, self.shape[1])])
         goal_2_array[-1][-1] = 0
 
-        if np.array_equal(self.state, goal_1_array) or np.array_equal(
-            self.state, goal_2_array
-        ):
+        if np.array_equal(self.state, goal_1_array) or np.array_equal(self.state, goal_2_array):
             return True
-
+            
         return False
 
     def __repr__(self) -> str:
@@ -215,6 +201,12 @@ class XPuzzle:
             acc_str += "\n"
 
         return acc_str.strip("\n")
+    
+    def __str__(self) -> str:
+        str_acc = ""
+        for tile in np.ravel(self.state):
+            str_acc += str(tile) + " "
+        return str_acc.strip()
 
     def __eq__(self, other) -> bool:
         return np.array_equal(self.state, other.state)
@@ -222,27 +214,29 @@ class XPuzzle:
     def __hash__(self) -> int:
         return hash(str(self.state))
 
-    def copy(self) -> "XPuzzle":
+    def copy(self) -> 'XPuzzle':
         return XPuzzle(np.copy(self.state), self.shape)
 
 
-@dataclass(order=True)
+@dataclass(order=True, unsafe_hash=True)
 class PrioritizedPuzzle:
     """
     https://bugs.python.org/issue31145
     Wrapper class to be able to keep XPuzzles in a Priority Queue
     """
-
     priority: int
-    item: XPuzzle = field(compare=False)
+    item: XPuzzle=field(compare=False)
 
     def __init__(self, priority: int, item: XPuzzle):
         self.priority = priority
         self.item = item
-
+    
     def __iter__(self):
         yield self.priority
         yield self.item
+    
+    def __eq__(self, other):
+        return self.priority == other.priority and self.item == other.item
 
 
 class Move(ABC):
