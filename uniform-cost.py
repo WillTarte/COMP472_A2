@@ -27,14 +27,14 @@ def uniform_cost(starting_puzzle: XPuzzle):
     f_score: Dict[XPuzzle, int] = {}
     f_score[starting_puzzle] = 0
 
-    search_path: List[Tuple[int, int, XPuzzle]] = []
+    search_path: List[Tuple[int, XPuzzle]] = []
 
     path_taken: List[XPuzzle] = []
 
     while len(open_set) != 0:
 
         priority, current = heapq.heappop(open_set)
-        search_path.append((f_score[current], g_score[current]))
+        search_path.append((f_score[current], current))
         closed_set.append(PrioritizedPuzzle(priority, current))
         
         if current.is_goal_state():
@@ -135,8 +135,8 @@ if __name__ == "__main__":
             # search path file
             with open("results/{}_uniform_cost_search.txt".format(ind), "w") as f_search:
                 for node in search_path:
-                    f_search.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
-        
+                    f_search.write(" {} {}\n".format(node[0], str(node[1])))
+                    
         except TimeoutError as e:
             print(e)
         except Exception as e:
