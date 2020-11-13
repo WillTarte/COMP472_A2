@@ -1,12 +1,12 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
 from timeout import timeout
+from heuristics import calcH0, calcH1, calcH2
 import heapq
 import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
-#I kept getting random freezes when it was at 60
-@timeout(59)
+@timeout(60)
 def uniform_cost(starting_puzzle: XPuzzle):
     """
     Uniform Cost Search Algorithm
@@ -27,14 +27,17 @@ def uniform_cost(starting_puzzle: XPuzzle):
     f_score: Dict[XPuzzle, int] = {}
     f_score[starting_puzzle] = 0
 
-    search_path: List[Tuple[int, XPuzzle]] = []
+    h_score: Dict[XPuzzle, int] = {}
+    h_score[starting_puzzle] = 0
+
+    search_path: List[Tuple[int, int, int, XPuzzle]] = []
 
     path_taken: List[XPuzzle] = []
 
     while len(open_set) != 0:
 
         priority, current = heapq.heappop(open_set)
-        search_path.append((f_score[current], current))
+        search_path.append((f_score[current], g_score[current], h_score[current], current))
         closed_set.append(PrioritizedPuzzle(priority, current))
         
         if current.is_goal_state():
@@ -50,7 +53,8 @@ def uniform_cost(starting_puzzle: XPuzzle):
             if neighbour not in g_score.keys() or new_gScore < g_score[neighbour]:
                 came_from[neighbour] = (move, current)
                 g_score[neighbour] = new_gScore
-                f_score[neighbour] = g_score[neighbour]
+                h_score[neighbour] = 0
+                f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
 
             in_closed = False
             in_open = False
@@ -58,12 +62,23 @@ def uniform_cost(starting_puzzle: XPuzzle):
             for priority, puzzle in closed_set:
                 if puzzle == neighbour:
                     in_closed = True
+                    if priority > f_score[neighbour]:
+                        closed_set.remove(PrioritizedPuzzle(priority, puzzle))
+                        heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
+            
+            if not in_closed:
+                for priority, puzzle in open_set:
+                    if puzzle == neighbour:
+                        in_open = True
+                        if priority > f_score[neighbour]:
+                            open_set.remove(PrioritizedPuzzle(priority, puzzle))
+                            heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
             
             if not in_closed and not in_open:
                 heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
 
 
-    return (path_taken, search_path, g_score, f_score)
+    return (path_taken, search_path, h_score, g_score, f_score)
 
 def reconstruct_path(edges_taken: Dict[XPuzzle, Tuple[Type[Move], XPuzzle]], current_state: XPuzzle) -> List:
     """
@@ -103,7 +118,7 @@ if __name__ == "__main__":
     # Command line argument parsing
     import argparse
 
-    parser = argparse.ArgumentParser(description="Uniform Cost algorithm")
+    parser = argparse.ArgumentParser(description="Uniform cost algorithm.")
     parser.add_argument('-f', '--filename', dest='filename', default=r"samplePuzzles.txt", type=str)
     parser.add_argument('-s', '--shape', dest='shape', default=(2, 4), nargs=2, type=int)
 
@@ -114,10 +129,12 @@ if __name__ == "__main__":
 
     # Iterate through all the puzzles, applying uniform cost
     for ind, puzzle in enumerate(puzzles):
+
+        # h1
         try:
             # applying uniform cost
             start_time = time.time()
-            path_taken, search_path, g_score, f_score = uniform_cost(puzzle)
+            path_taken, search_path, h_score, g_score, f_score = uniform_cost(puzzle)
             elapsed_time = time.time() - start_time
 
             # solution path file
@@ -135,8 +152,8 @@ if __name__ == "__main__":
             # search path file
             with open("results/{}_uniform_cost_search.txt".format(ind), "w") as f_search:
                 for node in search_path:
-                    f_search.write(" {} {}\n".format(node[0], str(node[1])))
-                    
+                    f_search.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
+        
         except TimeoutError as e:
             print(e)
         except Exception as e:
