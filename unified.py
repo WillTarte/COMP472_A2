@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="A Star algorithm using 2(+1) different heuristics.")
     parser.add_argument('-f', '--filename', dest='filename', default=r"samplePuzzles.txt", type=str)
-    parser.add_argument('-s', '--shape', dest='shape', default=(2, 4), nargs=2)
+    parser.add_argument('-s', '--shape', dest='shape', default=(2, 4), nargs=2, type=int)
     parser.add_argument('-gbf', '--greedy', dest='gbf', action='store_true')
     parser.add_argument('-ucs', '--uniform', dest='ucs', action='store_true')
 
