@@ -11,9 +11,7 @@ def main():
     while (len(listSet) < 50):
         shuffled = np.random.permutation(defaultArray)
         if not np.array_equal(shuffled, goalArray1) and not np.array_equal(shuffled, goalArray2):
-
             listSet.add(tuple(shuffled))
-
     
     with open(fileName, 'w') as fp:
         for t in listSet:
