@@ -7,10 +7,10 @@ from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
 @timeout(60)
-def a_star(starting_puzzle: XPuzzle, h: Callable):
+def uniform_cost(starting_puzzle: XPuzzle):
     """
-    A Star Informed search algorithm.
-    https://en.wikipedia.org/wiki/A*_search_algorithm#Description
+    Uniform Cost Search Algorithm
+    https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Practical_optimizations_and_infinite_graphs
     """
 
     open_set: List[PrioritizedPuzzle] = []
@@ -25,10 +25,10 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
     g_score[starting_puzzle] = 0
 
     f_score: Dict[XPuzzle, int] = {}
-    f_score[starting_puzzle] = min(h(starting_puzzle.state))
+    f_score[starting_puzzle] = 0
 
     h_score: Dict[XPuzzle, int] = {}
-    h_score[starting_puzzle] = min(h(starting_puzzle.state))
+    h_score[starting_puzzle] = 0
 
     search_path: List[Tuple[int, int, int, XPuzzle]] = []
 
@@ -53,7 +53,7 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
             if neighbour not in g_score.keys() or new_gScore < g_score[neighbour]:
                 came_from[neighbour] = (move, current)
                 g_score[neighbour] = new_gScore
-                h_score[neighbour] = min(h(neighbour.state))
+                h_score[neighbour] = 0
                 f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
 
             in_closed = False
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     # Command line argument parsing
     import argparse
 
-    parser = argparse.ArgumentParser(description="A Star algorithm using 2(+1) different heuristics.")
+    parser = argparse.ArgumentParser(description="Uniform cost algorithm.")
     parser.add_argument('-f', '--filename', dest='filename', default=r"samplePuzzles.txt", type=str)
     parser.add_argument('-s', '--shape', dest='shape', default=(2, 4), nargs=2, type=int)
 
@@ -127,62 +127,33 @@ if __name__ == "__main__":
     shape: Tuple[int, int] = tuple(args.shape) #type: ignore
     puzzles = XPuzzle.from_file(args.filename, shape)
 
-    # Iterate through all the puzzles, applying a-star with heuristic #1 and #2 + output results to files
+    # Iterate through all the puzzles, applying uniform cost
     for ind, puzzle in enumerate(puzzles):
 
         # h1
         try:
-            # applying a-star
+            # applying uniform cost
             start_time = time.time()
-            path_taken_h1, search_path_h1, h_score_h1, g_score_h1, f_score_h1 = a_star(puzzle, calcH1)
+            path_taken, search_path, h_score, g_score, f_score = uniform_cost(puzzle)
             elapsed_time = time.time() - start_time
 
             # solution path file
-            with open("results/{}_astar-h1_solution.txt".format(ind), "w") as f_solution_h1:
+            with open("results/{}_uniform_cost_solution.txt".format(ind), "w") as f_solution:
                 total_cost = 0
-                for move, new_state in path_taken_h1[::-1]: # we iterate from end to beginning because the order is reversed
+                for move, new_state in path_taken[::-1]: # we iterate from end to beginning because the order is reversed
                     if move is None:
-                        f_solution_h1.write("{} {} {}\n".format(0, 0, str(new_state)))
+                        f_solution.write("{} {} {}\n".format(0, 0, str(new_state)))
                     else:
-                        f_solution_h1.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
+                        f_solution.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
                         total_cost += move.cost
                 
-                f_solution_h1.write("\n{} {}".format(total_cost, elapsed_time))
+                f_solution.write("\n{} {}".format(total_cost, elapsed_time))
             
             # search path file
-            with open("results/{}_astar-h1_search.txt".format(ind), "w") as f_search_h1:
-                for node in search_path_h1:
-                    f_search_h1.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
+            with open("results/{}_uniform_cost_search.txt".format(ind), "w") as f_search:
+                for node in search_path:
+                    f_search.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
-        except TimeoutError as e:
-            print(e)
-        except Exception as e:
-            print(e)
-        
-        # h2
-        try:
-            # applying a-star
-            start_time = time.time()
-            path_taken_h2, search_path_h2, h_score_h2, g_score_h2, f_score_h2 = a_star(puzzle, calcH2)
-            elapsed_time = time.time() - start_time
-
-            # solution path file
-            with open("results/{}_astar-h2_solution.txt".format(ind), "w") as f_solution_h2:
-                total_cost = 0
-                for move, new_state in path_taken_h2[::-1]: # we iterate from end to beginning because the order is reversed
-                    if move is None:
-                        f_solution_h2.write("{} {} {}\n".format(0, 0, str(new_state)))
-                    else:
-                        f_solution_h2.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
-                        total_cost += move.cost
-                
-                f_solution_h2.write("\n{} {}".format(total_cost, elapsed_time))
-            
-            # search path file
-            with open("results/{}_astar-h2_search.txt".format(ind), "w") as f_search_h2:
-                for node in search_path_h2:
-                    f_search_h2.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
-       
         except TimeoutError as e:
             print(e)
         except Exception as e:
