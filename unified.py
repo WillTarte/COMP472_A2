@@ -6,6 +6,7 @@ import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 import sys
+import os
 
 @timeout(60)
 def unified_search(starting_puzzle: XPuzzle, h: Callable, gbf: bool, ucs: bool):
@@ -106,11 +107,11 @@ def reconstruct_path(edges_taken: Dict[XPuzzle, Tuple[Type[Move], XPuzzle]], cur
     return path_taken
 
 
-def timer_ended(ind: int, filename: str, h: str):
-    with open("results/{}_{}{}_solution.txt".format(ind, filename, h), "w") as f_solution:
+def timer_ended(ind: int, filename: str, h: str, input_name: str):
+    with open("results/{}/{}_{}{}_solution.txt".format(input_name, ind, filename, h), "w") as f_solution:
         f_solution.write("no solution")
             
-    with open("results/{}_{}{}_search.txt".format(ind, filename, h), "w") as f_search:
+    with open("results/{}/{}_{}{}_search.txt".format(input_name, ind, filename, h), "w") as f_search:
         f_search.write("no solution")
 
 
@@ -139,6 +140,11 @@ if __name__ == "__main__":
     shape: Tuple[int, int] = tuple(args.shape) #type: ignore
     puzzles = XPuzzle.from_file(args.filename, shape)
 
+    output_dir = "results/{}".format(args.filename[:-4])
+
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
     gbf: bool = args.gbf
     ucs: bool = args.ucs
 
@@ -157,7 +163,7 @@ if __name__ == "__main__":
 
     # Iterate through all the puzzles, applying a-star with heuristic #1 and #2 + output results to files
     for ind, puzzle in enumerate(puzzles):
-
+        print(f'Performing puzzle {ind}')
         # h1
         try:
             # applying a-star
@@ -166,7 +172,7 @@ if __name__ == "__main__":
             elapsed_time = time.time() - start_time
 
             # solution path file
-            with open("results/{}_{}-h1_solution.txt".format(ind, filename), "w") as f_solution_h1:
+            with open("results/{}/{}_{}-h1_solution.txt".format(args.filename[:-4], ind, filename), "w") as f_solution_h1:
                 total_cost = 0
                 for move, new_state in path_taken_h1[::-1]: # we iterate from end to beginning because the order is reversed
                     if move is None:
@@ -178,16 +184,16 @@ if __name__ == "__main__":
                 f_solution_h1.write("\n{} {}".format(total_cost, elapsed_time))
             
             # search path file
-            with open("results/{}_{}-h1_search.txt".format(ind, filename), "w") as f_search_h1:
+            with open("results/{}/{}_{}-h1_search.txt".format(args.filename[:-4], ind, filename), "w") as f_search_h1:
                 for node in search_path_h1:
                     f_search_h1.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
         except TimeoutError as e:
             print(e)
             if ucs:
-                timer_ended(ind, filename, '')
+                timer_ended(ind, filename, '', args.filename[:-4])
             else:
-                timer_ended(ind, filename, '-h1')
+                timer_ended(ind, filename, '-h1', args.filename[:-4])
 
         
         # h2
@@ -199,7 +205,7 @@ if __name__ == "__main__":
                 elapsed_time = time.time() - start_time
 
                 # solution path file
-                with open("results/{}_{}-h2_solution.txt".format(ind, filename), "w") as f_solution_h2:
+                with open("results/{}/{}_{}-h2_solution.txt".format(args.filename[:-4], ind, filename), "w") as f_solution_h2:
                     total_cost = 0
                     for move, new_state in path_taken_h2[::-1]: # we iterate from end to beginning because the order is reversed
                         if move is None:
@@ -211,11 +217,11 @@ if __name__ == "__main__":
                     f_solution_h2.write("\n{} {}".format(total_cost, elapsed_time))
                 
                 # search path file
-                with open("results/{}_{}-h2_search.txt".format(ind, filename), "w") as f_search_h2:
+                with open("results/{}/{}_{}-h2_search.txt".format(args.filename[:-4], ind, filename), "w") as f_search_h2:
                     for node in search_path_h2:
                         f_search_h2.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
             except TimeoutError as e:
-                print('reee')
-                timer_ended(ind, filename, '-h2')
+                print(e)
+                timer_ended(ind, filename, '-h2', args.filename[:-4])
 
