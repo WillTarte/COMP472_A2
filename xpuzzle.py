@@ -37,7 +37,9 @@ class XPuzzle:
                     break
 
                 puzzle_data: List[int] = []
-                for char in (line.strip("\n")).replace(" ", ""):
+                # for char in (line.strip("\n")).replace(" ", ""):
+                #     puzzle_data.append(int(char))
+                for char in (line.strip("\n")).split(" "):
                     puzzle_data.append(int(char))
 
                 state_data: List[List[int]] = []
