@@ -156,5 +156,9 @@ if __name__ == "__main__":
         
         except TimeoutError as e:
             print(e)
+            with open("results/{}_uniform_cost_solution.txt".format(ind), "w") as f_solution:
+                f_solution.write("No solution found in 60 seconds")
+            with open("results/{}_uniform_cost_search.txt".format(ind), "w") as f_search:
+                f_search.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)
