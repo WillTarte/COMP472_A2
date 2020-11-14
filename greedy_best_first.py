@@ -1,12 +1,15 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
-from timeout import timeout
+from timeout import timeout, TimeoutError
 from heuristics import calcH0, calcH1, calcH2
 
 import heapq
 import numpy as np
-import time
 
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
+
+import time
+import sys
+import os
 
 @timeout(60)
 def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
@@ -52,7 +55,7 @@ def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
             # new_gScore: int = g_score[current] + move.cost
             new_gScore: int = 0
 
-            if neighbour not in g_score.keys() or new_gScore < g_score[neighbour]:
+            if neighbour not in h_score.keys():
                 came_from[neighbour] = (move, current)
                 g_score[neighbour] = new_gScore
                 h_score[neighbour] = min(h(neighbour.state))
@@ -107,6 +110,16 @@ def reconstruct_path(edges_taken: Dict[XPuzzle, Tuple[Type[Move], XPuzzle]], cur
 
     return path_taken
 
+
+def timer_ended(ind: int, filename: str, h: str, input_name: str):
+    with open("results/{}/{}_{}{}_solution.txt".format(input_name, ind, filename, h), "w") as f_solution:
+        f_solution.write("no solution")
+            
+    with open("results/{}/{}_{}{}_search.txt".format(input_name, ind, filename, h), "w") as f_search:
+        f_search.write("no solution")
+
+
+
 if __name__ == "__main__":
 
     def get_tile_to_move(move: Type[Move], puzzle: XPuzzle):
@@ -129,9 +142,16 @@ if __name__ == "__main__":
     shape: Tuple[int, int] = tuple(args.shape) #type: ignore
     puzzles = XPuzzle.from_file(args.filename, shape)
 
+    output_dir: str = "results/{}".format(args.filename[:-4])
+    filename: str = 'gbf'
+
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
+
     # Iterate through all the puzzles, applying gbf with heuristic #1 and #2 + output results to files
     for ind, puzzle in enumerate(puzzles):
-
+        print(f'Performing puzzle {ind}')
         # h1
         try:
             # applying gbf
@@ -140,7 +160,7 @@ if __name__ == "__main__":
             elapsed_time = time.time() - start_time
 
             # solution path file
-            with open("results/{}_gbf-h1_solution.txt".format(ind), "w") as f_solution_h1:
+            with open("results/{}/{}_{}-h1_solution.txt".format(args.filename[:-4], ind, filename), "w") as f_solution_h1:
                 total_cost = 0
                 for move, new_state in path_taken_h1[::-1]: # we iterate from end to beginning because the order is reversed
                     if move is None:
@@ -158,8 +178,7 @@ if __name__ == "__main__":
         
         except TimeoutError as e:
             print(e)
-        except Exception as e:
-            print(e)
+            timer_ended(ind, filename, '-h1', args.filename[:-4])
         
         # h2
         try:
@@ -169,7 +188,7 @@ if __name__ == "__main__":
             elapsed_time = time.time() - start_time
 
             # solution path file
-            with open("results/{}_gbf-h2_solution.txt".format(ind), "w") as f_solution_h2:
+            with open("results/{}/{}_{}-h2_solution.txt".format(args.filename[:-4], ind, filename), "w") as f_solution_h2:
                 total_cost = 0
                 for move, new_state in path_taken_h2[::-1]: # we iterate from end to beginning because the order is reversed
                     if move is None:
@@ -187,5 +206,4 @@ if __name__ == "__main__":
        
         except TimeoutError as e:
             print(e)
-        except Exception as e:
-            print(e)
+            timer_ended(ind, filename, '-h2', args.filename[:-4])
