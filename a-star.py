@@ -156,6 +156,10 @@ if __name__ == "__main__":
         
         except TimeoutError as e:
             print(e)
+            with open("results/{}_astar-h1_solution.txt".format(ind), "w") as f_solution_h1:
+                f_solution_h1.write("No solution found in 60 seconds")
+            with open("results/{}_astar-h1_search.txt".format(ind), "w") as f_search_h1:
+                f_search_h1.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)
         
@@ -185,5 +189,9 @@ if __name__ == "__main__":
        
         except TimeoutError as e:
             print(e)
+            with open("results/{}_astar-h2_solution.txt".format(ind), "w") as f_solution_h2:
+                f_solution_h2.write("No solution found in 60 seconds")
+            with open("results/{}_astar-h2_search.txt".format(ind), "w") as f_search_h2:
+                f_search_h2.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)
