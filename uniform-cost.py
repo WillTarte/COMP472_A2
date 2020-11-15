@@ -16,7 +16,7 @@ def uniform_cost(starting_puzzle: XPuzzle):
     open_set: List[PrioritizedPuzzle] = []
     open_set.append(PrioritizedPuzzle(0, starting_puzzle))
 
-    closed_set: List[PrioritizedPuzzle] = []
+    visited: Set[XPuzzle] = set()
 
     came_from: Dict[XPuzzle, Optional[Tuple[Type[Move], XPuzzle]]] = {}
     came_from[starting_puzzle] = None
@@ -37,45 +37,24 @@ def uniform_cost(starting_puzzle: XPuzzle):
     while len(open_set) != 0:
 
         priority, current = heapq.heappop(open_set)
-        search_path.append((f_score[current], g_score[current], h_score[current], current))
-        closed_set.append(PrioritizedPuzzle(priority, current))
+        if current not in visited:
+            visited.add(current)
+            search_path.append((f_score[current], g_score[current], h_score[current], current))
         
-        if current.is_goal_state():
-            path_taken = reconstruct_path(came_from, current) #type: ignore
-            break
+            if current.is_goal_state():
+                path_taken = reconstruct_path(came_from, current) #type: ignore
+                break
 
-        if len(current.valid_moves) == 0:
-            current.find_valid_moves()
+            if len(current.valid_moves) == 0:
+                current.find_valid_moves()
         
-        for move, neighbour in current.valid_moves:
-            new_gScore: int = g_score[current] + move.cost
-
-            if neighbour not in g_score.keys() or new_gScore < g_score[neighbour]:
-                came_from[neighbour] = (move, current)
-                g_score[neighbour] = new_gScore
-                h_score[neighbour] = 0
-                f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
-
-            in_closed = False
-            in_open = False
-
-            for priority, puzzle in closed_set:
-                if puzzle == neighbour:
-                    in_closed = True
-                    if priority > f_score[neighbour]:
-                        closed_set.remove(PrioritizedPuzzle(priority, puzzle))
-                        heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
-            
-            if not in_closed:
-                for priority, puzzle in open_set:
-                    if puzzle == neighbour:
-                        in_open = True
-                        if priority > f_score[neighbour]:
-                            open_set.remove(PrioritizedPuzzle(priority, puzzle))
-                            heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
-            
-            if not in_closed and not in_open:
-                heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
+            for move, neighbour in current.valid_moves:
+                if neighbour not in visited or g_score[neighbour] > priority + move.cost:
+                    came_from[neighbour] = (move, current)
+                    g_score[neighbour] = priority + move.cost
+                    h_score[neighbour] = 0
+                    f_score[neighbour] = g_score[neighbour]
+                    heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
 
 
     return (path_taken, search_path, h_score, g_score, f_score)
