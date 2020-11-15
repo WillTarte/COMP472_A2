@@ -1,12 +1,12 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
-from timeout import timeout
+import timeout
 from heuristics import calcH0, calcH1, calcH2
 import heapq
 import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
-@timeout(60)
+@timeout.timeout(60)
 def a_star(starting_puzzle: XPuzzle, h: Callable):
     """
     A Star Informed search algorithm.
@@ -48,12 +48,14 @@ def a_star(starting_puzzle: XPuzzle, h: Callable):
             current.find_valid_moves()
         
         for move, neighbour in current.valid_moves:
-            new_gScore: int = g_score[current] + move.cost
-
-            if neighbour not in g_score.keys() or new_gScore < g_score[neighbour]:
-                came_from[neighbour] = (move, current)
-                g_score[neighbour] = new_gScore
+            if neighbour not in h_score.keys():
                 h_score[neighbour] = min(h(neighbour.state))
+
+            new_fScore: int = (g_score[current] + move.cost) + h_score[neighbour]
+
+            if neighbour not in f_score.keys() or new_fScore < f_score[neighbour]:
+                came_from[neighbour] = (move, current)
+                g_score[neighbour] = g_score[current] + move.cost
                 f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
 
             in_closed = False
@@ -154,8 +156,12 @@ if __name__ == "__main__":
                 for node in search_path_h1:
                     f_search_h1.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
-        except TimeoutError as e:
+        except timeout.TimeoutError as e:
             print(e)
+            with open("results/{}_astar-h1_solution.txt".format(ind), "w") as f_solution_h1:
+                f_solution_h1.write("No solution found in 60 seconds")
+            with open("results/{}_astar-h1_search.txt".format(ind), "w") as f_search_h1:
+                f_search_h1.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)
         
@@ -183,7 +189,11 @@ if __name__ == "__main__":
                 for node in search_path_h2:
                     f_search_h2.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
        
-        except TimeoutError as e:
+        except timeout.TimeoutError as e:
             print(e)
+            with open("results/{}_astar-h2_solution.txt".format(ind), "w") as f_solution_h2:
+                f_solution_h2.write("No solution found in 60 seconds")
+            with open("results/{}_astar-h2_search.txt".format(ind), "w") as f_search_h2:
+                f_search_h2.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)

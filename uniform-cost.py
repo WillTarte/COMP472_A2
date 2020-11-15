@@ -1,12 +1,12 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
-from timeout import timeout
+import timeout
 from heuristics import calcH0, calcH1, calcH2
 import heapq
 import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
-@timeout(60)
+@timeout.timeout(60)
 def uniform_cost(starting_puzzle: XPuzzle):
     """
     Uniform Cost Search Algorithm
@@ -154,7 +154,11 @@ if __name__ == "__main__":
                 for node in search_path:
                     f_search.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
-        except TimeoutError as e:
+        except timeout.TimeoutError as e:
             print(e)
+            with open("results/{}_uniform_cost_solution.txt".format(ind), "w") as f_solution:
+                f_solution.write("No solution found in 60 seconds")
+            with open("results/{}_uniform_cost_search.txt".format(ind), "w") as f_search:
+                f_search.write("No solution found in 60 seconds")
         except Exception as e:
             print(e)
