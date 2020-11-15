@@ -15,6 +15,7 @@ import os
 def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
     """
     Greedy Best First Search Algorithm
+    https://www.geeksforgeeks.org/best-first-search-informed-search/
     """
 
     open_set: List[PrioritizedPuzzle] = []
