@@ -15,12 +15,13 @@ import os
 def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
     """
     Greedy Best First Search Algorithm
+    https://www.geeksforgeeks.org/best-first-search-informed-search/
     """
 
     open_set: List[PrioritizedPuzzle] = []
     open_set.append(PrioritizedPuzzle(0, starting_puzzle))
 
-    closed_set: List[PrioritizedPuzzle] = []
+    closed_set: List[XPuzzle] = []
 
     came_from: Dict[XPuzzle, Optional[Tuple[Type[Move], XPuzzle]]] = {}
     came_from[starting_puzzle] = None
@@ -41,8 +42,6 @@ def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
     while len(open_set) != 0:
 
         priority, current = heapq.heappop(open_set)
-        search_path.append((f_score[current], g_score[current], h_score[current], current))
-        closed_set.append(PrioritizedPuzzle(priority, current))
         
         if current.is_goal_state():
             path_taken = reconstruct_path(came_from, current) #type: ignore
@@ -50,37 +49,21 @@ def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
 
         if len(current.valid_moves) == 0:
             current.find_valid_moves()
-        
-        for move, neighbour in current.valid_moves:
-            # new_gScore: int = g_score[current] + move.cost
-            new_gScore: int = 0
 
-            if neighbour not in h_score.keys():
-                came_from[neighbour] = (move, current)
-                g_score[neighbour] = new_gScore
-                h_score[neighbour] = min(h(neighbour.state))
-                f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
+        if current not in closed_set:
+            closed_set.append(current)
+            search_path.append((f_score[current], g_score[current], h_score[current], current))
 
-            in_closed = False
-            in_open = False
+            for move, neighbour in current.valid_moves:
+                # new_gScore: int = g_score[current] + move.cost
+                new_gScore: int = 0
 
-            for priority, puzzle in closed_set:
-                if puzzle == neighbour:
-                    in_closed = True
-                    if priority > f_score[neighbour]:
-                        closed_set.remove(PrioritizedPuzzle(priority, puzzle))
-                        heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
-            
-            if not in_closed:
-                for priority, puzzle in open_set:
-                    if puzzle == neighbour:
-                        in_open = True
-                        if priority > f_score[neighbour]:
-                            open_set.remove(PrioritizedPuzzle(priority, puzzle))
-                            heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
-            
-            if not in_closed and not in_open:
-                heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
+                if neighbour not in h_score.keys():
+                    came_from[neighbour] = (move, current)
+                    g_score[neighbour] = new_gScore
+                    h_score[neighbour] = min(h(neighbour.state))
+                    f_score[neighbour] = g_score[neighbour] + h_score[neighbour]
+                    heapq.heappush(open_set, PrioritizedPuzzle(f_score[neighbour], neighbour))
 
 
     return (path_taken, search_path, h_score, g_score, f_score)
