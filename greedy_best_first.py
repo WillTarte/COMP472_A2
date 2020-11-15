@@ -1,5 +1,5 @@
 from xpuzzle import XPuzzle, PrioritizedPuzzle, Move
-from timeout import timeout, TimeoutError
+import timeout
 from heuristics import calcH0, calcH1, calcH2
 
 import heapq
@@ -11,7 +11,7 @@ import time
 import sys
 import os
 
-@timeout(60)
+@timeout.timeout(60)
 def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
     """
     Greedy Best First Search Algorithm
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                 for node in search_path_h1:
                     f_search_h1.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
         
-        except TimeoutError as e:
+        except timeout.TimeoutError as e:
             print(e)
             timer_ended(ind, filename, '-h1', args.filename[:-4])
         
@@ -204,6 +204,6 @@ if __name__ == "__main__":
                 for node in search_path_h2:
                     f_search_h2.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
        
-        except TimeoutError as e:
+        except timeout.TimeoutError as e:
             print(e)
             timer_ended(ind, filename, '-h2', args.filename[:-4])
