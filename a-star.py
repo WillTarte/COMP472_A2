@@ -6,7 +6,7 @@ import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
-@timeout.timeout(60)
+@timeout.timeout(900)
 def a_star(starting_puzzle: XPuzzle, h: Callable):
     """
     A Star Informed search algorithm.
