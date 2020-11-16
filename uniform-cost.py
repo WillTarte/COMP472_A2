@@ -6,7 +6,7 @@ import numpy as np
 from typing import List, Tuple, Dict, Callable, Set, Type, Optional
 import time
 
-@timeout.timeout(60)
+@timeout.timeout(900)
 def uniform_cost(starting_puzzle: XPuzzle):
     """
     Uniform Cost Search Algorithm

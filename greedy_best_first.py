@@ -11,7 +11,7 @@ import time
 import sys
 import os
 
-@timeout.timeout(60)
+@timeout.timeout(900)
 def greedy_best_first(starting_puzzle: XPuzzle, h: Callable):
     """
     Greedy Best First Search Algorithm
