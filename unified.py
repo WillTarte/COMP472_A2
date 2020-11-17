@@ -121,6 +121,34 @@ if __name__ == "__main__":
             try:
                 # applying a-star
                 start_time = time.time()
+                path_taken_h0, search_path_h0, h_score_h0, g_score_h0, f_score_h0 = search_func(puzzle, calcH0)
+                elapsed_time = time.time() - start_time
+
+                # solution path file
+                with open("results/{}/{}_{}-h0_solution.txt".format(args.filename[:-4], ind, filename), "w") as f_solution_h0:
+                    total_cost = 0
+                    for move, new_state in path_taken_h0[::-1]: # we iterate from end to beginning because the order is reversed
+                        if move is None:
+                            f_solution_h0.write("{} {} {}\n".format(0, 0, str(new_state)))
+                        else:
+                            f_solution_h0.write("{} {} {}\n".format(get_tile_to_move(move, new_state), move.cost, str(new_state)))
+                            total_cost += move.cost
+                    
+                    f_solution_h0.write("\n{} {}".format(total_cost, elapsed_time))
+                
+                # search path file
+                with open("results/{}/{}_{}-h0_search.txt".format(args.filename[:-4], ind, filename), "w") as f_search_h0:
+                    for node in search_path_h0:
+                        f_search_h0.write("{} {} {} {}\n".format(node[0], node[1], node[2], str(node[3])))
+            
+            except TimeoutError as e:
+                print(e)
+                timer_ended(ind, filename, '-h0', args.filename[:-4])
+
+            # h1
+            try:
+                # applying a-star
+                start_time = time.time()
                 path_taken_h1, search_path_h1, h_score_h1, g_score_h1, f_score_h1 = search_func(puzzle, calcH1)
                 elapsed_time = time.time() - start_time
 
