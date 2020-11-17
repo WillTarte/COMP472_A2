@@ -7,10 +7,10 @@ def main():
     goalArray1 = np.array([1, 2, 3, 4, 5, 6, 7, 0])
     goalArray2 = np.array([1, 3, 5, 7, 2, 4, 6, 0])
 
-    goalArray69 = np.arange(1, 55)
+    goalArray69 = np.arange(1, 26)
     goalArray69[-1] = 0
-    firstGoal = goalArray69.reshape(6, 9)
-    secondGoal = firstGoal.reshape(9, 6).transpose()
+    firstGoal = goalArray69.reshape(5, 5)
+    secondGoal = firstGoal.reshape(5, 5).transpose()
     print(firstGoal)
     print(secondGoal)
 

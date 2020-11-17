@@ -10,17 +10,17 @@ def main():
     generatedPuzzles = 'generatedPuzzles'
     samplePuzzles = 'samplePuzzles'
 
-    ucsSearch = glob.glob('./results/generatedPuzzles/*ucs*search*')
-    gbfH1Search = glob.glob('./results/generatedPuzzles/*gbf*h1*search*')
-    gbfH2Search = glob.glob('./results/generatedPuzzles/*gbf*h2*search*')
-    astarH1Search = glob.glob('./results/generatedPuzzles/*astar*h1*search*')
-    astarH2Search = glob.glob('./results/generatedPuzzles/*astar*h2*search*')
+    ucsSearch = glob.glob('./results/scaledUp/*ucs*search*')
+    gbfH1Search = glob.glob('./results/scaledUp/*gbf*h1*search*')
+    gbfH2Search = glob.glob('./results/scaledUp/*gbf*h2*search*')
+    astarH1Search = glob.glob('./results/scaledUp/*astar*h1*search*')
+    astarH2Search = glob.glob('./results/scaledUp/*astar*h2*search*')
 
-    ucsSolutions = glob.glob('./results/generatedPuzzles/*ucs*solution*')
-    gbfH1Solutions = glob.glob('./results/generatedPuzzles/*gbf*h1*solution*')
-    gbfH2Solutions = glob.glob('./results/generatedPuzzles/*gbf*h2*solution*')
-    astarH1Solutions = glob.glob('./results/generatedPuzzles/*astar*h1*solution*')
-    astarH2Solutions = glob.glob('./results/generatedPuzzles/*astar*h2*solution*')
+    ucsSolutions = glob.glob('./results/scaledUp/*ucs*solution*')
+    gbfH1Solutions = glob.glob('./results/scaledUp/*gbf*h1*solution*')
+    gbfH2Solutions = glob.glob('./results/scaledUp/*gbf*h2*solution*')
+    astarH1Solutions = glob.glob('./results/scaledUp/*astar*h1*solution*')
+    astarH2Solutions = glob.glob('./results/scaledUp/*astar*h2*solution*')
 
     # Average and total length of the solutions and search path
     # Average/total of no solution

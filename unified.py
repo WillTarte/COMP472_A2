@@ -117,9 +117,9 @@ if __name__ == "__main__":
         else:
             # is a-star or greedy best first
             
-            # h1
+            # h0
             try:
-                # applying a-star
+                # Running algo with H0
                 start_time = time.time()
                 path_taken_h0, search_path_h0, h_score_h0, g_score_h0, f_score_h0 = search_func(puzzle, calcH0)
                 elapsed_time = time.time() - start_time
